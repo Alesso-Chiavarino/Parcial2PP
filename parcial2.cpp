@@ -162,7 +162,7 @@ void realizarEstadistica() {
 
   datosComercio listDatosComercio;
 
-  while(!archivoVentas.eof()) { //mientras no haya finalizado el archivo
+  while(!archivoVentas.eof()) { 
     archivoVentas.read((char *)&listDatosComercio,sizeof(datosComercio));
 
     if(!archivoVentas.eof()) {
@@ -193,7 +193,7 @@ void realizarEstadistica() {
     archivoVendedor.read((char *)&listDatosVendedor,sizeof(datosVendedor));
 
     if(!archivoVendedor.eof()) {
-      if(listDatosComercio.codVendedor == listDatosVendedor.codVendedor) {
+      if((listDatosComercio.codVendedor == listDatosVendedor.codVendedor && listDatosComercio.importeFacturado > 1000)) {
       cout << "Nombre del vendedor: " << listDatosVendedor.nomVendedor << endl << endl;
       archivoEstadistica.write((char *)&listDatosVendedor,sizeof(datosVendedor));
       }
