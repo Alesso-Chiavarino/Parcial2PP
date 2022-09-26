@@ -59,7 +59,7 @@ void datosVentas() {
     archivoVendedor.read((char *)&listDatosVendedor,sizeof(datosVendedor));
 
     if(!archivoVendedor.eof()) {
-      cout << "Nombre del articulo: " << listDatosVendedor.nomVendedor << endl << endl;
+      cout << "Nombre del vendedor: " << listDatosVendedor.nomVendedor << endl << endl;
       cout << "Direccion del vendedor: " << listDatosVendedor.directVendedor << endl << endl;
     }
   }
@@ -97,6 +97,8 @@ void cargarArchivoComercio() {
     cin >> listDatosComercio.codVendedor;
 
     archivo.write((char *)&listDatosComercio,sizeof(datosComercio));
+
+    
   
   }
   
@@ -138,6 +140,104 @@ void cargarArchivoVendedor() {
   
 }
 
+void realizarEstadistica() {
+
+  ifstream archivoVentas;
+  ifstream archivoVendedor;
+  ofstream archivoEstadistica;
+
+  archivoEstadistica.open("estadistica.dat", ios::app | ios::binary);
+
+  if(archivoEstadistica.fail()) {
+    cout << "El archivo no se pudo abrir \n";
+    exit(1);
+  }
+
+  archivoVentas.open("ventas.dat", ios::in | ios::binary);
+
+  if(archivoVentas.fail()) {
+    cout << "El archivo no se pudo abrir!" << endl;
+    exit(1);
+  }
+
+  datosComercio listDatosComercio;
+
+  while(!archivoVentas.eof()) { //mientras no haya finalizado el archivo
+    archivoVentas.read((char *)&listDatosComercio,sizeof(datosComercio));
+
+    if(!archivoVentas.eof()) {
+      if(listDatosComercio.importeFacturado > 1000) {
+      
+      cout << "Nombre del articulo: " << listDatosComercio.nomArticulo << endl << endl;
+      cout << "Unidades vendidas: " << listDatosComercio.uniVendidas << endl << endl;
+      cout << "Numero de factura: " << listDatosComercio.numFactura << endl << endl;
+      cout << "Importe facturado: " << listDatosComercio.importeFacturado << endl << endl;
+
+      archivoEstadistica.write((char *)&listDatosComercio,sizeof(datosComercio));
+      }
+    }
+  }
+
+  // archivoVentas.close();
+
+  archivoVendedor.open("vendedor.dat", ios::in | ios::binary);
+
+  if(archivoVendedor.fail()) {
+    cout << "El archivo no se pudo abrir!" << endl;
+    exit(1);
+  }
+
+  datosVendedor listDatosVendedor;
+
+  while(!archivoVendedor.eof()) {
+    archivoVendedor.read((char *)&listDatosVendedor,sizeof(datosVendedor));
+
+    if(!archivoVendedor.eof()) {
+      if(listDatosComercio.codVendedor == listDatosVendedor.codVendedor) {
+      cout << "Nombre del vendedor: " << listDatosVendedor.nomVendedor << endl << endl;
+      archivoEstadistica.write((char *)&listDatosVendedor,sizeof(datosVendedor));
+      }
+    }
+  }
+
+  archivoVentas.close();
+  archivoVendedor.close();
+  archivoEstadistica.close();
+}
+
+void estadistica() {
+  ifstream archivoEstadistica;
+  
+
+  archivoEstadistica.open("estadistica.dat", ios::in | ios::binary);
+
+  if(archivoEstadistica.fail()) {
+    cout << "El archivo no se pudo abrir \n";
+    exit(1);
+  }
+
+  datosVendedor listDatosVendedor;
+  datosComercio listDatosComercio;
+
+  while(!archivoEstadistica.eof()) {
+    archivoEstadistica.read((char *)&listDatosVendedor,sizeof(datosVendedor));
+
+    if(!archivoEstadistica.eof()) {
+      cout << "-----  Estadisticas  -----" << endl << endl << endl;
+      cout << "-----  Ventas con importe mayor a 1000:  -----" << endl << endl;
+      cout << "Nombre del articulo: " << listDatosComercio.nomArticulo << endl << endl;
+      cout << "Unidades vendidas: " << listDatosComercio.uniVendidas << endl << endl;
+      cout << "Numero de factura: " << listDatosComercio.numFactura << endl << endl;
+      cout << "Importe facturado: " << listDatosComercio.importeFacturado << endl << endl;
+      cout << "Nombre del vendedor: " << listDatosVendedor.nomVendedor << endl << endl;
+    }
+  }
+
+  archivoEstadistica.close();
+  getch();
+  archivoEstadistica.clear();
+}
+
 void menu() {
   int op ;
 
@@ -145,7 +245,8 @@ void menu() {
     cout << "1. Cargar informacion de ventas" << endl;
     cout << "2. Cargar informacion de vendedores" << endl;
     cout << "3. Mostrar datos ventas" << endl;
-    cout << "4. Salir" << endl;
+    cout << "4. Estadistica" << endl;
+    cout << "5. Salir" << endl;
     cin >> op;
 
     switch(op) {
@@ -159,6 +260,10 @@ void menu() {
         datosVentas();
         break;
       case 4:
+        realizarEstadistica();
+        estadistica();
+        break;
+      case 5:
         exit(1);
       default:
         cout << "Por favor, escoja una opcion correcta." << endl;
@@ -166,7 +271,7 @@ void menu() {
 
     system("pause");
     system("cls");
-  } while(op!=4);
+  } while(op!=5);
   
 }
 
