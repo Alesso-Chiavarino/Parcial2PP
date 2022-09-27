@@ -21,6 +21,7 @@ struct datosVendedor {
 };
 
 void datosVentas() {
+  
   ifstream archivoVentas;
   ifstream archivoVendedor;
 
@@ -31,21 +32,6 @@ void datosVentas() {
     exit(1);
   }
 
-  datosComercio listDatosComercio;
-
-  while(!archivoVentas.eof()) { //mientras no haya finalizado el archivo
-    archivoVentas.read((char *)&listDatosComercio,sizeof(datosComercio));
-
-    if(!archivoVentas.eof()) {
-      cout << "Nombre del articulo: " << listDatosComercio.nomArticulo << endl << endl;
-      cout << "Unidades vendidas: " << listDatosComercio.uniVendidas << endl << endl;
-      cout << "Numero de factura: " << listDatosComercio.numFactura << endl << endl;
-      cout << "Importe facturado: " << listDatosComercio.importeFacturado << endl << endl;
-    }
-  }
-
-  archivoVentas.close();
-
   archivoVendedor.open("vendedor.dat", ios::in | ios::binary);
 
   if(archivoVendedor.fail()) {
@@ -53,17 +39,27 @@ void datosVentas() {
     exit(1);
   }
 
+  datosComercio listDatosComercio;
   datosVendedor listDatosVendedor;
 
-  while(!archivoVendedor.eof()) {
+  system("cls");
+  cout << endl << "-----  Datos de Ventas  -----" << endl << endl;
+  while(!archivoVentas.eof() && !archivoVendedor.eof()) { //mientras no haya finalizado el archivo
+    archivoVentas.read((char *)&listDatosComercio,sizeof(datosComercio));
     archivoVendedor.read((char *)&listDatosVendedor,sizeof(datosVendedor));
 
-    if(!archivoVendedor.eof()) {
+    if(!archivoVentas.eof()) {
+      cout << "Nombre del articulo: " << listDatosComercio.nomArticulo << endl << endl;
+      cout << "Unidades vendidas: " << listDatosComercio.uniVendidas << endl << endl;
+      cout << "Numero de factura: " << listDatosComercio.numFactura << endl << endl;
+      cout << "Importe facturado: " << listDatosComercio.importeFacturado << endl << endl;
       cout << "Nombre del vendedor: " << listDatosVendedor.nomVendedor << endl << endl;
       cout << "Direccion del vendedor: " << listDatosVendedor.directVendedor << endl << endl;
+      cout << "----------------------------------" << endl << endl;
     }
   }
 
+  archivoVentas.close();
   archivoVendedor.close();
   getch();
 
@@ -140,13 +136,13 @@ void cargarArchivoVendedor() {
   
 }
 
-void realizarEstadistica() {
+void estadistica() {
 
   ifstream archivoVentas;
   ifstream archivoVendedor;
   ofstream archivoEstadistica;
 
-  archivoEstadistica.open("estadistica.dat", ios::app | ios::binary);
+  archivoEstadistica.open("estadistica.dat", ios::out | ios::binary);
 
   if(archivoEstadistica.fail()) {
     cout << "El archivo no se pudo abrir \n";
@@ -160,26 +156,6 @@ void realizarEstadistica() {
     exit(1);
   }
 
-  datosComercio listDatosComercio;
-
-  while(!archivoVentas.eof()) { 
-    archivoVentas.read((char *)&listDatosComercio,sizeof(datosComercio));
-
-    if(!archivoVentas.eof()) {
-      if(listDatosComercio.importeFacturado > 1000) {
-      
-      cout << "Nombre del articulo: " << listDatosComercio.nomArticulo << endl << endl;
-      cout << "Unidades vendidas: " << listDatosComercio.uniVendidas << endl << endl;
-      cout << "Numero de factura: " << listDatosComercio.numFactura << endl << endl;
-      cout << "Importe facturado: " << listDatosComercio.importeFacturado << endl << endl;
-
-      archivoEstadistica.write((char *)&listDatosComercio,sizeof(datosComercio));
-      }
-    }
-  }
-
-  // archivoVentas.close();
-
   archivoVendedor.open("vendedor.dat", ios::in | ios::binary);
 
   if(archivoVendedor.fail()) {
@@ -187,55 +163,56 @@ void realizarEstadistica() {
     exit(1);
   }
 
+  datosComercio listDatosComercio;
   datosVendedor listDatosVendedor;
 
-  while(!archivoVendedor.eof()) {
+  while(!archivoVendedor.eof() && !archivoVentas.eof()) {
     archivoVendedor.read((char *)&listDatosVendedor,sizeof(datosVendedor));
+    archivoVentas.read((char *)&listDatosComercio,sizeof(datosComercio));
 
-    if(!archivoVendedor.eof()) {
+    // if(!archivoVendedor.eof()) {
       if((listDatosComercio.codVendedor == listDatosVendedor.codVendedor && listDatosComercio.importeFacturado > 1000)) {
-      cout << "Nombre del vendedor: " << listDatosVendedor.nomVendedor << endl << endl;
       archivoEstadistica.write((char *)&listDatosVendedor,sizeof(datosVendedor));
-      }
+      archivoEstadistica.write((char *)&listDatosComercio,sizeof(datosComercio));
+      // }
     }
   }
 
   archivoVentas.close();
   archivoVendedor.close();
   archivoEstadistica.close();
-}
 
-void estadistica() {
-  ifstream archivoEstadistica;
+  ifstream archivoEstadisticas;
   
 
-  archivoEstadistica.open("estadistica.dat", ios::in | ios::binary);
+  archivoEstadisticas.open("estadistica.dat", ios::in | ios::binary);
 
-  if(archivoEstadistica.fail()) {
+  if(archivoEstadisticas.fail()) {
     cout << "El archivo no se pudo abrir \n";
     exit(1);
   }
 
-  datosVendedor listDatosVendedor;
-  datosComercio listDatosComercio;
+  system("cls");
+  cout << endl << "-------  ESTADISTICAS  -------" << endl << endl;
+  cout << "--//  Ventas con importe mayor a 1000:  //--" << endl << endl;
+  while(!archivoEstadisticas.eof()) {
+    archivoEstadisticas.read((char *)&listDatosVendedor,sizeof(datosVendedor));
+    archivoEstadisticas.read((char *)&listDatosComercio,sizeof(datosComercio));
 
-  while(!archivoEstadistica.eof()) {
-    archivoEstadistica.read((char *)&listDatosVendedor,sizeof(datosVendedor));
-
-    if(!archivoEstadistica.eof()) {
-      cout << "-----  Estadisticas  -----" << endl << endl << endl;
-      cout << "-----  Ventas con importe mayor a 1000:  -----" << endl << endl;
+    if(!archivoEstadisticas.eof()) {
       cout << "Nombre del articulo: " << listDatosComercio.nomArticulo << endl << endl;
       cout << "Unidades vendidas: " << listDatosComercio.uniVendidas << endl << endl;
       cout << "Numero de factura: " << listDatosComercio.numFactura << endl << endl;
       cout << "Importe facturado: " << listDatosComercio.importeFacturado << endl << endl;
       cout << "Nombre del vendedor: " << listDatosVendedor.nomVendedor << endl << endl;
+      cout << "----------------------------------" << endl << endl;
     }
+    
+    // getch();
+    // exit(1);
   }
 
-  archivoEstadistica.close();
-  getch();
-  archivoEstadistica.clear();
+  archivoEstadisticas.close();
 }
 
 void menu() {
@@ -260,7 +237,6 @@ void menu() {
         datosVentas();
         break;
       case 4:
-        realizarEstadistica();
         estadistica();
         break;
       case 5:
