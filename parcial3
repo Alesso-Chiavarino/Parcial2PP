@@ -1,0 +1,272 @@
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <vector>
+#include <fstream>
+#include <conio.h>
+#include <cstdlib> //para system
+#include <iomanip> //para setprecision y fixed
+
+using namespace std;
+
+struct datosEmpleados {
+	char nomEmplado[30], direcEmplado[30];
+	long double sueldoEmplado;
+};
+
+struct datosVenta {
+	char fecha[20], prodNombre[30], modoPago[10];
+	float importeFacturado, precioProd;
+};
+
+struct usuarios {
+	char nomUsuario[40];
+	int contraUsuario;
+};
+
+void cargarDatosEmpleados() {
+
+	ofstream archivo;
+	string elec;
+
+	archivo.open("empleados.dat", ios::app | ios::binary);
+
+	if (archivo.fail()) {
+		cout << "El arhivo no se encontró" << endl;
+		exit(1);
+	}
+
+	datosEmpleados listDatosEmpleados;
+
+	do {
+
+		cout << "Por favor ingrese su nombre:" << endl;
+		cin.ignore();
+		cin.getline(listDatosEmpleados.nomEmplado, 30, '\n');
+		cout << "Por favor ingrese su direccion:" << endl;
+		cin.ignore(0, '\n');
+		cin.getline(listDatosEmpleados.direcEmplado, 30, '\n');
+		cout << "Por favor ingrese sueldo del empleado:" << endl;
+		cin >> listDatosEmpleados.sueldoEmplado;
+
+		archivo.write((char*)&listDatosEmpleados, sizeof(datosEmpleados));
+
+
+
+
+
+		cout << "Para registrar otro producto digite (s)" << endl;
+		cin >> elec;
+
+	} while (elec == "S" || elec == "s");
+
+
+	archivo.close();
+
+}
+
+void leerDatosEmpleados() {
+
+	ifstream archivo;
+
+	archivo.open("empleados.dat", ios::in | ios::binary);
+
+	if (archivo.fail()) {
+		cout << "El arhivo no se pudo abrir" << endl;
+		exit(1);
+	}
+
+	datosEmpleados listDatosEmpleados;
+
+	while (!archivo.eof()) {
+
+		archivo.read((char*)&listDatosEmpleados, sizeof(datosEmpleados));
+
+		if (!archivo.eof()) {
+			cout << "El nombre del empleado es: " << listDatosEmpleados.nomEmplado << endl;
+			cout << "La direccion del empleado es: " << listDatosEmpleados.direcEmplado << endl;
+			cout << setprecision(2) << fixed << "El sueldo del empleado es: " << listDatosEmpleados.sueldoEmplado << endl;
+		}
+
+	}
+
+	archivo.close();
+
+}
+
+
+
+void menu() {
+	int op;
+
+	do {
+		cout << "|--------------------|" << endl;
+		cout << "|  Menu de opciones  |" << endl;
+		cout << "|--------------------|" << endl << endl;
+
+		cout << ".1 Cargar datos emplados" << endl;
+		cout << ".2 Cargar datos ventas" << endl;
+		cout << ".3 Estadisticas" << endl;
+		cout << ".5 Salir" << endl;
+		cin >> op;
+
+		switch (op) {
+		case 1: cargarDatosEmpleados();
+			break;
+		case 3: leerDatosEmpleados();
+			break;
+		case 5: exit(1);
+		default: cout << "Por favor, ingrese una opcion correcta." << endl;
+		}
+		system("pause");
+		system("cls");
+
+		//getch();
+		system("cls");
+	} while (op != 5);
+
+
+}
+
+void registro() {
+
+	usuarios listUsuarios;
+	ofstream archivoUsuarios;
+
+	archivoUsuarios.open("usuarios.dat", ios::app | ios::binary);
+
+	if (archivoUsuarios.fail()) {
+		cout << "El archivo no pudo abrirse!" << endl;
+		exit(1);
+	}
+
+	cout << "|----------------------------------------|" << endl;
+	cout << "| Bienvenido al sistema de Supermercado! |" << endl;
+	cout << "|----------------------------------------|" << endl << endl;
+
+	cout << "Ingrese su nombre de usuario:" << endl;
+	cin.getline(listUsuarios.nomUsuario, 40, '\n');
+	cout << "Ingrese una contraseña: " << endl;
+	cin >> listUsuarios.contraUsuario;
+
+	archivoUsuarios.write((char*)&listUsuarios, sizeof(usuarios));
+
+	archivoUsuarios.close();
+}
+
+void inicioSesion() {
+	ifstream archivoUsuarios;
+	usuarios listUsuarios;
+
+	char userName[40];
+	int userPassword;
+
+	cout << "Por favor, ingrese su nombre de usuario:" << endl;
+	cin.ignore();
+	cin.getline(userName, 40, '\n');
+	cout << "Por favor, ingrese su contraseña" << endl;
+	cin >> userPassword;
+
+	archivoUsuarios.open("usuarios.dat", ios::in | ios::binary);
+
+	if (archivoUsuarios.fail()) {
+		cout << "El archivo no pudo abrirse!" << endl;
+		exit(1);
+	}
+
+	while (!archivoUsuarios.eof()) { //mientras no haya finalizado el archivo
+		archivoUsuarios.read((char*)&listUsuarios, sizeof(usuarios));
+
+		if (!archivoUsuarios.eof()) {
+
+			
+			if (strcmp(userName, listUsuarios.nomUsuario) == 0 && userPassword == listUsuarios.contraUsuario) {
+				system("cls");
+				menu();
+			}
+			else {
+				exit(1);
+			}
+
+
+			
+		}
+	}
+
+	archivoUsuarios.close();
+}
+
+void inicio() {
+	int op;
+
+	do {
+		cout << "|----------------------------------------|" << endl;
+		cout << "| Bienvenido al sistema de Supermercado! |" << endl;
+		cout << "|----------------------------------------|" << endl << endl;
+
+		cout << ".1 Registrar" << endl;
+		cout << ".2 Iniciar sesion" << endl;
+
+		cin >> op;
+
+		switch (op) {
+		case 1: registro();
+			break;
+		case 2: inicioSesion();
+			break;
+		case 3: exit(1);
+		default: cout << "Por favor, ingrese una opcion correcta." << endl;
+		}
+		system("pause");
+		system("cls");
+
+		//getch();
+		system("cls");
+
+	} while (op != 3);
+	
+}
+
+void inicio2() {
+
+	int intentos = 0;
+	char usuario[20] = "alesso", usuarioCargado[20];
+	int contraseña = 123456, contraseñaCargada;
+	int intentosMalos = 2;
+
+	cout << "|----------------------------------------|" << endl;
+	cout << "| Bienvenido al sistema de Supermercado! |" << endl;
+	cout << "|----------------------------------------|" << endl << endl;
+
+
+
+	do {
+		cout << "---- Inicio de sesion ----" << endl << endl;
+		cout << "Ingrese su usuario:" << endl;
+		cin >> usuarioCargado;
+		cout << "Ingrese su contraseña:" << endl;
+		cin >> contraseñaCargada;
+		if ((usuarioCargado != usuario && contraseñaCargada != contraseña)) {
+			cout << "El usuario o la contraseña ingresados son incorrectos." << endl;
+			cout << "Te quedan " << intentosMalos << " intentos!" << endl;
+			_getch();
+			intentosMalos--;
+			intentos++;
+			system("cls");
+
+		}
+		else {
+			system("cls");
+			menu();
+		}
+	} while (intentos != 3);
+
+}
+
+int main() {
+	//inicio(); aca
+	registro();
+	inicioSesion();
+	//inicio();
+	return 0;
+}
